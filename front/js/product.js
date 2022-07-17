@@ -65,3 +65,81 @@ function lesProduits(produit) {
   console.log("affichage effectué");
 }
 
+// choix couleur dynamique
+//------------------------------------------------------------------------
+
+// définition des variables
+let choixCouleur = document.querySelector("#colors");
+
+// écoute ce qu'il se passe dans #colors
+choixCouleur.addEventListener("input", (ec) => {
+  let couleurProduit;
+
+  // on récupère la valeur de la cible de l'évenement dans couleur
+  couleurProduit = ec.target.value;
+
+  // on ajoute la couleur à l'objet panierClient
+  articleClient.couleur = couleurProduit;
+
+  // reset la couleur et le texte du bouton si il y a une action sur les inputs dans le cas d'une autre commande du même produit
+  document.querySelector("#addToCart").style.color = "white";
+  document.querySelector("#addToCart").textContent = "Ajouter au panier";
+  console.log(couleurProduit);
+});
+
+// choix quantité dynamique
+//------------------------------------------------------------------------
+
+// définition des variables
+let choixQuantité = document.querySelector('input[id="quantity"]');
+let quantitéProduit;
+
+// écoute ce qu'il se passe dans input[name="itemQuantity"]
+choixQuantité.addEventListener("input", (eq) => {
+
+  // récupère la valeur de la cible de l'évenement dans couleur
+  quantitéProduit = eq.target.value;
+
+  // ajoute la quantité à l'objet panierClient
+  articleClient.quantité = quantitéProduit;
+
+  // reset la couleur et le texte du bouton si il y a une action sur les inputs dans le cas d'une autre commande du même produit
+  document.querySelector("#addToCart").style.color = "white";
+  document.querySelector("#addToCart").textContent = "Ajouter au panier";
+  console.log(quantitéProduit);
+});
+
+// conditions de validation du clic via le bouton ajouter au panier
+//------------------------------------------------------------------------
+
+// déclaration variable
+let choixProduit = document.querySelector("#addToCart");
+
+// On écoute ce qu'il se passe sur le bouton #addToCart pour faire l'action :
+choixProduit.addEventListener("click", () => {
+
+  //conditions de validation du bouton ajouter au panier
+  if (
+    // les valeurs sont créées dynamiquement au click, et à l'arrivée sur la page, tant qu'il n'y a pas d'action sur la couleur et/ou la quantité, c'est 2 valeurs sont undefined.
+    articleClient.quantité < 1 ||
+    articleClient.quantité > 100 ||
+    articleClient.quantité === undefined ||
+    articleClient.couleur === "" ||
+    articleClient.couleur === undefined
+  ) {
+
+    // joue l'alerte
+    alert("Pour valider le choix de cet article, veuillez renseigner une couleur, et/ou une quantité valide entre 1 et 100");
+
+    // si ça passe le controle
+  } else {
+
+    // joue panier
+    Panier();
+    console.log("clic effectué");
+
+    //effet visuel d'ajout de produit
+    document.querySelector("#addToCart").style.color = "rgb(0, 205, 0)";
+    document.querySelector("#addToCart").textContent = "Produit ajouté !";
+  }
+});
