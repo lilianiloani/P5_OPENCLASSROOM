@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------
+
 // Récupération de l'id du produit via l' URL
 //--------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ fetch("http://localhost:3000/api/products")
   .then((productObjects) => {
 
     // execution de la fontion lesProduits
-    lesProduits(productObjects);
+    canape(productObjects);
   })
   .catch((err) => {
     document.querySelector(".item").innerHTML = "<h1>erreur 404</h1>";
@@ -27,20 +27,20 @@ fetch("http://localhost:3000/api/products")
 //------------------------------------------------------------------------
 
 // déclaration objet articleClient prêt à être modifiée par les fonctions suivantes d'évènements
-let articleClient = {};
+let chosenProduct = {};
 
 // id du procuit
-articleClient._id = id;
+chosenProduct._id = id;
 
 // fonction d'affichage du produit de l'api
 //------------------------------------------------------------------------
-function lesProduits(produit) {
+function canape(produit) {
   // déclaration des variables pointage des éléments
   let imageAlt = document.querySelector("article div.item__img");
-  let titre = document.querySelector("#title");
-  let prix = document.querySelector("#price");
+  let title = document.querySelector("#title");
+  let price = document.querySelector("#price");
   let description = document.querySelector("#description");
-  let couleurOption = document.querySelector("#colors");
+  let colorOption = document.querySelector("#colors");
 
   // boucle for pour chercher un indice
   for (let choix of produit) {
@@ -50,63 +50,59 @@ function lesProduits(produit) {
 
       //éléments ajoutés dynamiquement
       imageAlt.innerHTML = `<img src="${choix.imageUrl}" alt="${choix.altTxt}">`;
-      titre.textContent = `${choix.name}`;
-      prix.textContent = `${choix.price}`;
+      title.textContent = `${choix.name}`;
+      price.textContent = `${choix.price}`;
       description.textContent = `${choix.description}`;
 
-      // boucle pour chercher les couleurs pour chaque produit en fonction de sa clef/valeur (la logique: tableau dans un tableau = boucle dans boucle)
+      // boucle pour chercher les couleurs pour chaque produit en fonction de sa valeur 
       for (let couleur of choix.colors) {
 
         // ajout des balises d'option couleur avec leur valeur
-        couleurOption.innerHTML += `<option value="${couleur}">${couleur}</option>`;
+        colorOption.innerHTML += `<option value="${couleur}">${couleur}</option>`;
       }
     }
   }
-  console.log("affichage effectué");
+  console.log("afficher le produits");
 }
 
 // choix couleur dynamique
 //------------------------------------------------------------------------
 
 // définition des variables
-let choixCouleur = document.querySelector("#colors");
+let colorChoice = document.querySelector("#colors");
 
 // écoute ce qu'il se passe dans #colors
-choixCouleur.addEventListener("input", (ec) => {
-  let couleurProduit;
+colorChoice.addEventListener("input", (ec) => {
+  let productColor;
 
   // on récupère la valeur de la cible de l'évenement dans couleur
-  couleurProduit = ec.target.value;
-
-  // on ajoute la couleur à l'objet panierClient
-  articleClient.couleur = couleurProduit;
-
+  productColor = ec.target.value;
+  chosenProduct.couleur = productColor;
+  
   // reset la couleur et le texte du bouton si il y a une action sur les inputs dans le cas d'une autre commande du même produit
   document.querySelector("#addToCart").style.color = "white";
   document.querySelector("#addToCart").textContent = "Ajouter au panier";
-  console.log(couleurProduit);
+  console.log(productColor);
 });
 
 // choix quantité dynamique
 //------------------------------------------------------------------------
 
 // définition des variables
-let choixQuantité = document.querySelector('input[id="quantity"]');
-let quantitéProduit;
+let choiceQuantity = document.querySelector('input[id="quantity"]');
+let productQuantity;
 
 // écoute ce qu'il se passe dans input[name="itemQuantity"]
-choixQuantité.addEventListener("input", (eq) => {
+choiceQuantity.addEventListener("input", (eq) => {
 
   // récupère la valeur de la cible de l'évenement dans couleur
-  quantitéProduit = eq.target.value;
-
-  // ajoute la quantité à l'objet panierClient
-  articleClient.quantité = quantitéProduit;
+  productQuantity = eq.target.value;
+  chosenProduct.quantité = productQuantity;
 
   // reset la couleur et le texte du bouton si il y a une action sur les inputs dans le cas d'une autre commande du même produit
   document.querySelector("#addToCart").style.color = "white";
   document.querySelector("#addToCart").textContent = "Ajouter au panier";
-  console.log(quantitéProduit);
+  console.log(productQuantity);
 });
 
 // conditions de validation du clic via le bouton ajouter au panier
@@ -121,11 +117,11 @@ choixProduit.addEventListener("click", () => {
   //conditions de validation du bouton ajouter au panier
   if (
     // les valeurs sont créées dynamiquement au click, et à l'arrivée sur la page, tant qu'il n'y a pas d'action sur la couleur et/ou la quantité, c'est 2 valeurs sont undefined.
-    articleClient.quantité < 1 ||
-    articleClient.quantité > 100 ||
-    articleClient.quantité === undefined ||
-    articleClient.couleur === "" ||
-    articleClient.couleur === undefined
+    chosenProduct.quantité < 1 ||
+    chosenProduct.quantité > 100 ||
+    chosenProduct.quantité === undefined ||
+    chosenProduct.couleur === "" ||
+    chosenProduct.couleur === undefined
   ) {
 
     // joue l'alerte
@@ -144,12 +140,12 @@ choixProduit.addEventListener("click", () => {
   }
 });
 
-// Déclaration de tableaux utiles (voir mutation)
+// Déclaration de tableaux utiles 
 //------------------------------------------------------------------------
 // déclaration tableau qui sera le 1er, unique et destiné à initialiser le panier
 let choixProduitClient = [];
 
-// déclaration tableau qui sera ce qu'on récupère du local storage appelé panierStocké et qu'on convertira en JSon (importance dans Panier())
+// déclaration tableau qui sera ce qu'on récupère du local storage appelé panierStocké et qu'on convertira en JSon
 let produitsEnregistrés = [];
 
 // déclaration tableau qui sera un choix d'article/couleur non effectué donc non présent dans le panierStocké
@@ -168,11 +164,11 @@ function ajoutPremierProduit() {
   //si produitsEnregistrés est null c'est qu'il n'a pas été créé
   if (produitsEnregistrés === null) {
 
-    // pousse le produit choisit dans choixProduitClient
-    choixProduitClient.push(articleClient);
-    console.log(articleClient);
+  // pousse le produit choisit dans choixProduitClient
+  choixProduitClient.push(chosenProduct);
+  console.log(chosenProduct);
 
-    // dernière commande, envoit choixProduitClient dans le local storage sous le nom de panierStocké de manière JSON stringifié
+  // dernière commande, envoit choixProduitClient dans le local storage sous le nom de panierStocké de manière JSON stringifié
     return (localStorage.panierStocké = JSON.stringify(choixProduitClient));
   }
 }
@@ -214,14 +210,14 @@ function ajoutAutreProduit() {
 //--------------------------------------------------------------------
 function Panier() {
   // variable qui sera ce qu'on récupère du local storage appelé panierStocké et qu'on a convertit en JSon
-  produitsEnregistrés = JSON.parse(localStorage.getItem("panierStocké"));
+  produitsEnregistrés = JSON.parse(localStorage.getItem("items"));
 
   // si produitEnregistrés existe (si des articles ont déja été choisis et enregistrés par le client)
   if (produitsEnregistrés) {
     for (let choix of produitsEnregistrés) {
 
       //comparateur d'égalité des articles actuellement choisis et ceux déja choisis
-      if (choix._id === id && choix.couleur === articleClient.couleur) {
+      if (choix._id === id && choix.couleur === chosenProduct.couleur) {
 
         //information client
         alert("RAPPEL: Vous aviez déja choisit cet article.");
